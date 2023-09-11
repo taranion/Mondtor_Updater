@@ -24,8 +24,14 @@ jobs:
       run: |
         echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
+    - name: Package
+      run:  mvn -s settings.xml package
+        
+    - name: Show result1
+      run: ls target/
+
     - name: JPackage
-      run:  mkdir -p target/jpackage ;mvn jpackage:jpackage
+      run:  mkdir target/jpackage ;mvn jpackage:jpackage
         
     - name: Show result
       run: ls target/jpackage
@@ -35,7 +41,7 @@ jobs:
       uses: garygrossgarten/github-action-scp@release
       with:
         verbose: false
-        local: target/jpackage/mondtor-${{ env.RELEASE_VERSION }}-1.x86_64.rpm
+        local: target/jpackage/mondtor-updater-${{ env.RELEASE_VERSION }}-1.x86_64.rpm
         remote: /var/www/html/mondtor-builds/linux/Mondtor-Updater-${{env.RELEASE_VERSION}}.rpm
         host: eden.rpgframework.de
         username: ghcommlink

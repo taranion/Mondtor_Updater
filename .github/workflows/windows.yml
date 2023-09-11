@@ -17,10 +17,10 @@ jobs:
  
     # Setup the Windows build environment
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@master
+      uses: microsoft/setup-msbuild@v1.1
 
     - name: Visual Studio shell
-      uses: egor-tensin/vs-shell@master
+      uses: egor-tensin/vs-shell@v2
 
     - name: Get version (bash)
       continue-on-error: true
@@ -32,8 +32,14 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Package
+      run:  mvn -s settings.xml package
+        
+    - name: Show result1
+      run: ls target/
+
     - name: Compile
-      run:  mkdir -p target/jpackage ; mvn  -U -s settings.xml clean package jpackage:jpackage@win
+      run:  mkdir target/jpackage ; mvn  -U -s settings.xml clean package jpackage:jpackage@win
       env: 
         JFROG_USER: ${{ secrets.JFROG_USER }}
         JFROG_PASS: ${{ secrets.JFROG_PASS }}
