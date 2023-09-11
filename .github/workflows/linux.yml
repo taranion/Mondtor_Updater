@@ -46,4 +46,15 @@ jobs:
         host: eden.rpgframework.de
         username: ghmondtor
         password: ${{ secrets.DEPLOY_PASSWORD }}
+      
+    - name: Upload JRE DEB
+      continue-on-error: false
+      uses: garygrossgarten/github-action-scp@release
+      with:
+        verbose: true
+        local: target/jpackage/mondtor_${{ env.RELEASE_VERSION }}-1_amd64.deb
+        remote: /var/www/html/mondtor-builds/linux/Mondtor-Updater-${{env.RELEASE_VERSION}}.deb
+        host: eden.rpgframework.de
+        username: ghmondtor
+        password: ${{ secrets.DEPLOY_PASSWORD }}
     
