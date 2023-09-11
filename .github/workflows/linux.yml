@@ -15,6 +15,11 @@ jobs:
     - name: checkout sources
       uses: actions/checkout@master
 
+    - name: setup-graalvm-ce
+      uses: taranion/setup-graalvm@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Set Release version env variable
       run: |
         echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV

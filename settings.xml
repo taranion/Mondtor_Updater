@@ -1,0 +1,30 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0   https://maven.apache.org/xsd/settings-1.1.0.xsd"
+>
+	<servers>
+	</servers>
+	<profiles>
+		<profile>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<repositories>
+				<repository>
+					<id>ossrh</id>
+					<url>https://oss.sonatype.org/content/groups/public</url>
+					<snapshots><enabled>true</enabled></snapshots>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
+
+	<mirrors>
+		<mirror>
+			<id>maven-default-http-blocker</id>
+			<mirrorOf>external:http:*</mirrorOf>
+			<name>Pseudo repository to mirror external repositories initially using HTTP.</name>
+			<url>http://0.0.0.0/</url>
+			<blocked>false</blocked>
+		</mirror>
+	</mirrors>
+</settings>
