@@ -136,7 +136,7 @@
         			<execution>
             		<id>win</id>
             		<configuration>
-        					<resourceDir>src/jpackage/windows</resourceDir>
+        					<resourceDir>src/jpackage/win</resourceDir>
               		<icon>src/jpackage/win/Mondtor.ico</icon>
               		<type>MSI</type>
             		</configuration>
