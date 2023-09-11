@@ -92,7 +92,7 @@
         			<name>Mondtor</name>
         			<input>target</input>
         			<appVersion>${project.version}</appVersion>
-        			<vendor>Stefan Prelle / RPGFramework</vendor>
+        			<vendor>Stefan Prelle RPGFramework</vendor>
         			<copyright>2023 Stefan Prelle</copyright>
         			<description>Splittermond Charakterverwaltung</description>
         			<mainClass>${mainClassName}</mainClass>
