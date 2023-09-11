@@ -44,17 +44,6 @@ jobs:
         local: target/jpackage/mondtor-updater-${{ env.RELEASE_VERSION }}-1.x86_64.rpm
         remote: /var/www/html/mondtor-builds/linux/Mondtor-Updater-${{env.RELEASE_VERSION}}.rpm
         host: eden.rpgframework.de
-        username: ghcommlink
-        password: ${{ secrets.DEPLOY_PASSWORD }}
-      
-    - name: Upload JRE DEB
-      continue-on-error: false
-      uses: garygrossgarten/github-action-scp@release
-      with:
-        verbose: true
-        local: target/jpackage/mondtor_${{ env.RELEASE_VERSION }}-1_amd64.deb
-        remote: /var/www/html/mondtor-builds/linux/Mondtor-Updater-${{env.RELEASE_VERSION}}.deb
-        host: eden.rpgframework.de
-        username: ghcommlink
+        username: ghmondtor
         password: ${{ secrets.DEPLOY_PASSWORD }}
     

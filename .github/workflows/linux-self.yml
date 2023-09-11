@@ -15,6 +15,11 @@ jobs:
     - name: checkout sources
       uses: actions/checkout@v3
 
+    - name: setup-graalvm-ce
+      uses: taranion/setup-graalvm@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Set Release version env variable
       run: |
         echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
@@ -36,7 +41,7 @@ jobs:
         local: target/jpackage/mondtor-${{ env.RELEASE_VERSION }}-1.x86_64.rpm
         remote: /var/www/html/mondtor-builds/linux/Mondtor-Updater-jre-${{env.RELEASE_VERSION}}.rpm
         host: eden.rpgframework.de
-        username: ghcommlink
+        username: ghmondtor
         password: ${{ secrets.DEPLOY_PASSWORD }}
       
     - name: Upload JRE DEB
@@ -47,6 +52,6 @@ jobs:
         local: target/jpackage/mondtor-${{ env.RELEASE_VERSION }}-1_amd64.deb
         remote: /var/www/html/mondtor-builds/linux/Mondtor-Updater-jre-${{env.RELEASE_VERSION}}.deb
         host: eden.rpgframework.de
-        username: ghcommlink
+        username: ghmondtor
         password: ${{ secrets.DEPLOY_PASSWORD }}
     

@@ -61,6 +61,6 @@ jobs:
         local: "target\\jpackage\\Mondtor-${{env.RELEASE_VERSION}}.msi"
         remote: /var/www/html/mondtor-builds/win/Mondtor-Updater-${{env.RELEASE_VERSION}}.msi
         host: eden.rpgframework.de
-        username: ghcommlink
+        username: ghmondtor
         password: ${{ secrets.DEPLOY_PASSWORD }}
        

@@ -38,5 +38,5 @@ jobs:
         local: target/jpackage/Mondtor-1.0.0.dmg
         remote: /var/www/html/mondtor-builds/osx/Mondtor-Updater-${{env.RELEASE_VERSION}}.dmg
         host: eden.rpgframework.de
-        username: ghcommlink
+        username: ghmondtor
         password: ${{ secrets.DEPLOY_PASSWORD }}
