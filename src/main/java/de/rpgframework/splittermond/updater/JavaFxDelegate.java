@@ -1,5 +1,8 @@
 package de.rpgframework.splittermond.updater;
 
+import java.awt.Taskbar;
+import java.awt.Taskbar.Feature;
+import java.awt.Toolkit;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.util.List;
@@ -65,13 +68,25 @@ public class JavaFxDelegate extends Application implements Delegate {
 		startup.releaseTypeProperty().addListener( (ov,o,n) -> {});
 
 		Scene scene = new Scene(startup, Color.TRANSPARENT);
-		primaryStage.setOpacity(0.2);
 //		scene.getStylesheets().add(getClass().getResource("root.css").toExternalForm());
 
 //		primaryStage.getIcons().addAll(images);
 		primaryStage.setScene(scene);
 
 		primaryStage.setTitle("Mondtor Updater");
+		primaryStage.getIcons().add(new Image(ClassLoader.getSystemResourceAsStream("Mondtor.png")));
+
+		//Set icon on the taskbar/dock
+        if (Taskbar.isTaskbarSupported()) {
+            var taskbar = Taskbar.getTaskbar();
+
+            if (taskbar.isSupported(Feature.ICON_IMAGE)) {
+                final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+				var dockIcon = defaultToolkit.getImage(ClassLoader.getSystemResource("Mondtor.png"));
+                taskbar.setIconImage(dockIcon);
+            }
+
+        }
 		Platform.setImplicitExit(true);
 		primaryStage.show();
 	}
