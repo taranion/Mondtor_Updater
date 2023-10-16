@@ -67,6 +67,7 @@ public class StartupView extends VBox {
 	private Label lbLocalVersion, lbRemoteVersion;
 
 	private Button btnLaunch;
+	private Button btnCancel;
 	private Button btnUpdate;
 
 	private Configuration config;
@@ -136,8 +137,9 @@ public class StartupView extends VBox {
 		lbState   = new Label();
 		lbState.setWrapText(true);
 
-		btnLaunch = new Button("Launch application");
-		btnUpdate = new Button("Update");
+		btnLaunch = new Button("Anwendung starten");
+		btnUpdate = new Button("Aktualisieren");
+		btnCancel = new Button("Abbrechen");
 	}
 
 	//-------------------------------------------------------------------
@@ -183,7 +185,10 @@ public class StartupView extends VBox {
 
 		Region buf2 = new Region();
 		buf2.setPrefHeight(50);
-		VBox gridPlusButtons = new VBox(20,grid,buf2,btnUpdate, btnLaunch);
+		HBox lowButtons = new HBox(10, btnLaunch, btnCancel);
+		lowButtons.setAlignment(Pos.CENTER);
+
+		VBox gridPlusButtons = new VBox(20,grid,buf2,btnUpdate, lowButtons);
 		HBox.setMargin(gridPlusButtons, new Insets(4));
 		gridPlusButtons.setAlignment(Pos.TOP_CENTER);
 
@@ -245,19 +250,11 @@ public class StartupView extends VBox {
 			MondtorLauncher.primaryStage = primaryStage;
 			logger.log(Level.INFO, "Call config.launch()");
 			config.launch();
-//			Thread thread = new Thread( () -> {
-//				try {
-//					Thread.sleep(200);
-//					Platform.exit();
-//					Thread.sleep(2000);
-//					config.launch();
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			});
-//			thread.start();
-//			getScene().getWindow().hide();
+		});
+
+		btnCancel.setOnAction(ev -> {
+			Platform.exit();
+			System.exit(0);
 		});
 	}
 
@@ -331,7 +328,6 @@ public class StartupView extends VBox {
 	private void update() throws IOException {
 		logger.log(Level.DEBUG,"Base = "+config.getBasePath()+" from "+config.getBaseUri());
 		Path zip = Files.createTempDirectory("mondtor").resolve(cbType.getValue().name().toLowerCase()+".zip");
-		//Path zip = Paths.get("/tmp/mondtor_"+cbType.getValue().name().toLowerCase()+".zip");
 		logger.log(Level.DEBUG,"Archive to "+zip);
 		ArchiveUpdateOptions options = UpdateOptions.archive(zip);
 		options.updateHandler(new DefaultUpdateHandler() {

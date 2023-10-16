@@ -36,26 +36,26 @@ public class JavaFxDelegate extends Application implements Delegate {
 		launch();
 	}
 
-	public static List<Image> images;
-	public static Image inverted;
+//	public static List<Image> images;
+//	public static Image inverted;
 
 	@Override
 	public void init() {
 		System.setProperty("update4j.suppress.warning", "false");
 
-		List<String> sizes = List.of("tiny", "small", "medium", "large", "xlarge");
+//		List<String> sizes = List.of("tiny", "small", "medium", "large", "xlarge");
 //		images = sizes.stream()
 //						.map(s -> ("/icons/update4j-icon-" + s + ".png"))
 //						.map(s -> getClass().getResource(s).toExternalForm())
 //						.map(Image::new)
 //						.collect(Collectors.toList());
 //		inverted = new Image("/icons/update4j-icon-invert.png");
-		logger.log(Level.DEBUG, "class loader 1 = "+ClassLoader.getSystemClassLoader());
-		logger.log(Level.DEBUG, "class loader 2 = "+System.getProperty("java.class.path"));
-
-		for (String elem : System.getProperty("java.class.path").split(":")) {
-			logger.log(Level.DEBUG, "  "+elem);
-		}
+//		logger.log(Level.DEBUG, "class loader 1 = "+ClassLoader.getSystemClassLoader());
+//		logger.log(Level.DEBUG, "class loader 2 = "+System.getProperty("java.class.path"));
+//
+//		for (String elem : System.getProperty("java.class.path").split(":")) {
+//			logger.log(Level.DEBUG, "  "+elem);
+//		}
 	}
 
 	@Override
