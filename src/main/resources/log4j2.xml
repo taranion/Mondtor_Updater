@@ -4,10 +4,15 @@
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%5p [%15c] (%F:%L) - %m%n" />
 		</Console>
+
+      <File name="File" fileName="${sys:user.home}/Mondtor/logs-updater/updater.txt">
+			<PatternLayout pattern="%5p [%15c] (%F:%L) - %m%n" />
+      </File>
 	</Appenders>
 	<Loggers>
 		<Root level="INFO">
 			<AppenderRef ref="Console" />
+			<AppenderRef ref="File" />
 		</Root>
     	<Logger name="javafx" level="WARN"/>
     	<Logger name="jdk" level="ERROR"/>
