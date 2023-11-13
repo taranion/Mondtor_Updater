@@ -40,11 +40,10 @@ jobs:
       run: ls target/jpackage
       
     - name: Upload
-      continue-on-error: true
       uses: garygrossgarten/github-action-scp@release
       with:
         verbose: true
-        local: target/jpackage/Mondtor-Updater-${{ env.RELEASE_VERSION }}.dmg
+        local: "target/jpackage/Mondtor Updater-${{ env.RELEASE_VERSION }}.dmg"
         remote: /var/www/html/mondtor-builds/osx/Mondtor-Updater-${{env.RELEASE_VERSION}}.dmg
         host: eden.rpgframework.de
         username: ghmondtor
