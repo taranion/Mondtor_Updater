@@ -98,6 +98,7 @@
         			<mainClass>${mainClassName}</mainClass>
         			<mainJar>${project.artifactId}-${project.version}-jar-with-dependencies.jar</mainJar>
         			<destination>target/jpackage</destination>
+               <icon>src/jpackage/linux/Mondtor_128x1.png</icon>
         			<!--icon>src/darwin/assets/AppIcon.iconset/icon_128x1.png</icon-->
         			<javaOptions>
             		<option>-Dupdater.version=${project.version}</option>
@@ -148,7 +149,7 @@
         			<execution>
             		<id>osx</id>
             		<configuration>
-                		<icon>src/osx/Mondtor.icns</icon>
+                		<icon>src/jpackage/osx/Mondtor.icns</icon>
                 		<type>DMG</type>
              		</configuration>
         			</execution>
