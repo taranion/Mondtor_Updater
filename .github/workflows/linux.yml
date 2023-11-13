@@ -1,10 +1,10 @@
 name: Compile Linux Cloud
-on: [push]
-#on:
-#  push:
-#    # Sequence of patterns matched against refs/tags
-#    tags:
-#    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+#on: [push]
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 env:
   LANG: "de_DE.UTF-8"
 
@@ -52,7 +52,7 @@ jobs:
       uses: garygrossgarten/github-action-scp@release
       with:
         verbose: true
-        local: target/jpackage/mondtor_${{ env.RELEASE_VERSION }}-1_amd64.deb
+        local: target/jpackage/mondtor-updater_${{ env.RELEASE_VERSION }}-1_amd64.deb
         remote: /var/www/html/mondtor-builds/linux/Mondtor-Updater-${{env.RELEASE_VERSION}}.deb
         host: eden.rpgframework.de
         username: ghmondtor

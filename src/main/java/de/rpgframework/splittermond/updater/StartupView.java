@@ -1,7 +1,6 @@
 package de.rpgframework.splittermond.updater;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +16,9 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Locale;
+import java.util.prefs.Preferences;
 
 import org.update4j.Archive;
 import org.update4j.Configuration;
@@ -37,12 +38,15 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -53,6 +57,8 @@ import javafx.util.StringConverter;
  *
  */
 public class StartupView extends VBox {
+
+	private final static String PASSWORD_KEY = "patreon.password";
 
 	private final static Logger logger = System.getLogger("mondtor.updater");
 
@@ -65,6 +71,8 @@ public class StartupView extends VBox {
 	private ProgressBar progPerFile;
 	private Label lbState;
 	private Label lbLocalVersion, lbRemoteVersion;
+	private TextField tfPassword;
+	private Label hdPassword;
 
 	private Button btnLaunch;
 	private Button btnCancel;
@@ -109,9 +117,9 @@ public class StartupView extends VBox {
 		cbType.getItems().addAll(ReleaseType.values());
 		cbType.setConverter(new StringConverter<ReleaseType>() {
 			public String toString(ReleaseType val) {
-				if (val==ReleaseType.STABLE) return "Stable";
-				if (val==ReleaseType.TESTING) return "Testing";
-				if (val==ReleaseType.DEVELOP) return "Experimental";
+				if (val==ReleaseType.STABLE) return "Stabil";
+				if (val==ReleaseType.TESTING) return "Betatest";
+				if (val==ReleaseType.DEVELOP) return "Entwickler";
 				return (val!=null)?val.name():"?";
 			}
 			public ReleaseType fromString(String string) { return null;}
@@ -132,6 +140,12 @@ public class StartupView extends VBox {
 		lbCurrentFile = new Label();
 		lbLocalVersion = new Label();
 		lbRemoteVersion = new Label();
+		tfPassword = new PasswordField();
+		tfPassword.setPromptText("Patreon Password");
+		String oldPW = Preferences.userRoot().get(PASSWORD_KEY, null);
+		if (oldPW!=null)
+			tfPassword.setText(oldPW);
+
 		progFiles = new ProgressBar(0.0f);
 		progPerFile = new ProgressBar(0.0f);
 		lbState   = new Label();
@@ -140,6 +154,7 @@ public class StartupView extends VBox {
 		btnLaunch = new Button("Anwendung starten");
 		btnUpdate = new Button("Aktualisieren");
 		btnCancel = new Button("Abbrechen");
+		btnLaunch.setDisable(true);
 	}
 
 	//-------------------------------------------------------------------
@@ -149,14 +164,16 @@ public class StartupView extends VBox {
 		GridPane grid = new GridPane();
 		grid.setVgap(10);
 		grid.setHgap(10);
-		Label hdType = new Label("Type");
-		Label hdLang = new Label("Language");
-		Label hdLocal  = new Label("Installed:");
-		Label hdRemote = new Label("Most recent:");
+		Label hdType = new Label("Art");
+		Label hdLang = new Label("Sprache");
+		Label hdLocal  = new Label("Installiert:");
+		Label hdRemote = new Label("Verfügbar:");
+		hdPassword = new Label("Patreon Passwort:");
 		hdType.setStyle("-fx-font-weight: bold");
 		hdLang.setStyle("-fx-font-weight: bold");
 		hdLocal.setStyle("-fx-font-weight: bold");
 		hdRemote.setStyle("-fx-font-weight: bolder");
+		hdPassword.setStyle("-fx-font-weight: bolder");
 
 		grid.add(hdType, 0, 0);
 		grid.add(cbType, 1, 0);
@@ -164,9 +181,11 @@ public class StartupView extends VBox {
 //		grid.add(cbLang, 1, 1);
 		grid.add(new HBox(5,hdLocal, lbLocalVersion), 0, 2);
 		grid.add(new HBox(5,hdRemote, lbRemoteVersion), 1, 2);
-		grid.add(progFiles    , 0, 3, 2,1);
-		grid.add(progPerFile  , 0, 4, 2,1);
-//		grid.add(lbState, 0, 5, 2,1);
+		grid.add(hdPassword, 0, 3);
+		grid.add(tfPassword, 1, 3);
+		grid.add(progFiles    , 0, 4, 2,1);
+		grid.add(progPerFile  , 0, 5, 2,1);
+		grid.add(lbState, 0, 6, 2,1);
 
 		progPerFile.setMaxWidth(Double.MAX_VALUE);
 		GridPane.setFillWidth(progPerFile, true);
@@ -189,6 +208,7 @@ public class StartupView extends VBox {
 		lowButtons.setAlignment(Pos.CENTER);
 
 		VBox gridPlusButtons = new VBox(20,grid,buf2,btnUpdate, lowButtons);
+		VBox.setVgrow(lowButtons, Priority.NEVER);
 		HBox.setMargin(gridPlusButtons, new Insets(4));
 		gridPlusButtons.setAlignment(Pos.TOP_CENTER);
 
@@ -211,18 +231,32 @@ public class StartupView extends VBox {
 		cbType.getSelectionModel().selectedItemProperty().addListener( (ov,o,n) -> {
 			logger.log(Level.DEBUG, "Updated stability type to "+n);
 			if (n==null) return;
+
+			if (n==ReleaseType.DEVELOP) {
+				tfPassword.setVisible(true);
+				hdPassword.setVisible(true);
+			} else {
+				tfPassword.setVisible(false);
+				hdPassword.setVisible(false);
+			}
 			try {
 				updateLocalConfig();
 				updateRemoteConfig();
 				if (config==null) return;
 
 				logger.log(Level.INFO, "Config now "+config.getResolvedProperty("project.version"));
-				btnUpdate.setDisable(false);
 				if (config.requiresUpdate()) {
+					logger.log(Level.INFO, "Update required");
 					btnUpdate.setText("Update to "+config.getResolvedProperty("project.version"));
 					btnUpdate.setDisable(false);
-					btnLaunch.setDisable(false);
+					btnLaunch.setDisable(true);
 				} else {
+					logger.log(Level.INFO, "Update not required");
+					if (localConfig==null) {
+						logger.log(Level.INFO, "No local config "+localConfigPath);
+						Files.createDirectories(localConfigPath.getParent());
+						Files.write(localConfigPath, configXML);
+					}
 					btnUpdate.setDisable(true);
 					btnLaunch.setDisable(false);
 				}
@@ -244,6 +278,8 @@ public class StartupView extends VBox {
 		btnLaunch.setOnAction(ev -> {
 			logger.log(Level.INFO, "Launcher "+config.getLauncher());
 			logger.log(Level.INFO, "Launch "+config.getResolvedProperty(DefaultLauncher.MAIN_CLASS_PROPERTY_KEY));
+			System.setProperty("profile", cbType.getValue().name().toLowerCase());
+			System.setProperty("eden-server", cbType.getValue().server);
 			getScene().getWindow().hide();
 			((Stage)getScene().getWindow()).close();
 			System.setProperty("project.version", config.getResolvedProperty("project.version"));
@@ -256,12 +292,23 @@ public class StartupView extends VBox {
 			Platform.exit();
 			System.exit(0);
 		});
+
+		tfPassword.textProperty().addListener( (ov,o,n) -> {
+			try {
+				Preferences.userRoot().put(PASSWORD_KEY, n);
+				updateRemoteConfig();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 	}
 
 	//-------------------------------------------------------------------
 	private void updateLocalConfig() throws IOException {
 		localConfigPath = Paths.get(System.getProperty("user.home"), "Mondtor", "app", cbType.getValue().name().toLowerCase(), "config.xml");
 		logger.log(Level.INFO, "Expect local config at {0}", localConfigPath);
+		lbState.setText("Installiert unter: "+localConfigPath.getParent());
 		if (!Files.exists(localConfigPath)) {
 			localConfig = null;
 			logger.log(Level.INFO, "No local config at {0}", localConfigPath);
@@ -269,10 +316,11 @@ public class StartupView extends VBox {
 			btnLaunch.setDisable(true);
 			return;
 		}
+		logger.log(Level.INFO, "Found local config at {0}", localConfigPath);
 		try {
 			localConfig = Configuration.read(new FileReader(localConfigPath.toFile()));
 			Platform.runLater( () -> lbLocalVersion.setText(localConfig.getResolvedProperty("project.version")));
-			btnLaunch.setDisable(false);
+			btnLaunch.setDisable(!Files.exists(localConfigPath));
 		} catch (IOException e) {
 			logger.log(Level.ERROR, "Cannot load local config: "+e.getMessage());
 			btnLaunch.setDisable(true);
@@ -280,25 +328,45 @@ public class StartupView extends VBox {
 	}
 
 	//-------------------------------------------------------------------
+	private String getBasicAuthenticationHeader() {
+	    String valueToEncode = "patreon:" + tfPassword.getText();
+	    return "Basic " + Base64.getEncoder().encodeToString(valueToEncode.getBytes());
+	}
+
+	//-------------------------------------------------------------------
 	private void updateRemoteConfig() throws IOException {
 		ReleaseType n = cbType.getValue();
-		URL configUrl = new URL("http://"+n.getServer()+"/mondtor-updates/"+n.name().toLowerCase()+"/config.xml");
-		logger.log(Level.INFO, "Search config at {0}", configUrl);
+		//String credentials = "patreon:"+tfPassword.getText()+"@";
+		String credentials ="";
+		URL configUrl = new URL("http://"+credentials+n.getServer()+"/mondtor-updates/"+n.name().toLowerCase()+"/config.xml");
+		logger.log(Level.DEBUG, "Search config at {0}", configUrl);
 		config = null;
 		try {
-			HttpResponse<byte[]> response = HttpClient.newHttpClient().send(HttpRequest.newBuilder().uri(configUrl.toURI()).build(), HttpResponse.BodyHandlers.ofByteArray());
+			HttpResponse<byte[]> response = HttpClient
+					.newBuilder()
+					.build()
+					.send(HttpRequest.newBuilder()
+							.uri(configUrl.toURI())
+							.header("Authorization", getBasicAuthenticationHeader())
+							.build(), HttpResponse.BodyHandlers.ofByteArray());
 			switch (response.statusCode()) {
 			case 200:
 				configXML = response.body();
 				logger.log(Level.DEBUG, "Config successfully loaded with {0} bytes",configXML.length);
+				btnUpdate.setDisable(false);
 				break;
 			case 404:
 				logger.log(Level.DEBUG, "No config for {0} exists on remote server",n);
 				btnUpdate.setDisable(true);
 				return;
 			default:
-				logger.log(Level.ERROR, "Error loading config for {0} from remote server: {1}",n, response.statusCode());
 				btnUpdate.setDisable(true);
+				if (response.statusCode()==401) {
+					btnLaunch.setDisable(true);
+				} else {
+					logger.log(Level.ERROR, "Error loading config for {0} from remote server: {1}",n, response.statusCode());
+					btnLaunch.setDisable(false);
+				}
 				return;
 			}
 			Reader in = new InputStreamReader(new ByteArrayInputStream(configXML));
@@ -377,13 +445,13 @@ public class StartupView extends VBox {
 		Thread thread = new Thread( () -> {
 			SSLFix.execute();
 			UpdateResult result = config.update(options);
-			logger.log(Level.ERROR, "Result "+result);
+			logger.log(Level.ERROR, "config.update result "+result);
 			UpdateContext obj = result.result();
-			logger.log(Level.ERROR, "Result2 "+obj);
 			if (result.getException()==null) {
 				logger.log(Level.INFO, "All files downloaded and packaged as an archive ready to install");
 				try {
 					Archive.read(zip).install(true);
+					Files.createDirectories(localConfigPath.getParent());
 					Files.write(localConfigPath, configXML);
 					updateLocalConfig();
 				} catch (IOException e) {

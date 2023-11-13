@@ -15,16 +15,25 @@ jobs:
     - name: checkout sources
       uses: actions/checkout@master
 
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'oracle' # See 'Supported distributions' for available options
+        java-version: '18'
+
     - name: Set Release version env variable
       run: |
         echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
+    - name: Package
+      run:  mvn -s settings.xml package
+        
+    - name: Show result1
+      run: ls target/
+
     - name: JPackage
       run:   mvn jpackage:jpackage@osx
       env: 
-        JFROG_USER: ${{ secrets.JFROG_USER }}
-        JFROG_PASS: ${{ secrets.JFROG_PASS }}
-        LANG: en_EN
+        LANG: de_DE.UTF-8
         
     - name: Show result JPackage
       continue-on-error: true
@@ -35,7 +44,7 @@ jobs:
       uses: garygrossgarten/github-action-scp@release
       with:
         verbose: true
-        local: target/jpackage/Mondtor-1.0.0.dmg
+        local: target/jpackage/Mondtor-Updater-${{ env.RELEASE_VERSION }}.dmg
         remote: /var/www/html/mondtor-builds/osx/Mondtor-Updater-${{env.RELEASE_VERSION}}.dmg
         host: eden.rpgframework.de
         username: ghmondtor

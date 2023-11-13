@@ -18,7 +18,7 @@
 		<maven.skip.deploy>true</maven.skip.deploy>
 		<maven.skip.install>true</maven.skip.install>
 		<attach.version>4.0.18</attach.version>
-		<rpgfw.version>5.1.4-SNAPSHOT</rpgfw.version>
+		<rpgfw.version>5.1.5-SNAPSHOT</rpgfw.version>
 		<gluonfx.target>host</gluonfx.target>
 	</properties>
 
@@ -89,20 +89,24 @@
     			<artifactId>jpackage-maven-plugin</artifactId>
     			<version>1.6.0</version>
     			<configuration>
-        			<name>Mondtor</name>
+        			<name>Mondtor Updater</name>
         			<input>target</input>
         			<appVersion>${project.version}</appVersion>
-        			<vendor>Stefan Prelle RPGFramework</vendor>
+        			<vendor>RPGFramework</vendor>
         			<copyright>2023 Stefan Prelle</copyright>
         			<description>Splittermond Charakterverwaltung</description>
         			<mainClass>${mainClassName}</mainClass>
         			<mainJar>${project.artifactId}-${project.version}-jar-with-dependencies.jar</mainJar>
-        			<verbose>true</verbose>
         			<destination>target/jpackage</destination>
         			<!--icon>src/darwin/assets/AppIcon.iconset/icon_128x1.png</icon-->
         			<javaOptions>
-            		<option>-Dproject.version=${project.version}</option>
+            		<option>-Dupdater.version=${project.version}</option>
         			</javaOptions>
+        			<jLinkOptions>
+						  <jLinkOption>--strip-debug</jLinkOption>
+						  <jLinkOption>--no-header-files</jLinkOption>
+						  <jLinkOption>--no-man-pages</jLinkOption>
+					</jLinkOptions>
 					<aboutUrl>https://mondtor.rocks</aboutUrl>
 					<!-- Linux specific settings -->
   					<linuxAppCategory>Game</linuxAppCategory>
@@ -121,7 +125,7 @@
 					<!-- MAC specific settings -->
 					<macAppCategory>role-playing-games</macAppCategory>
 					<macDmgContentPaths>
-						<macDmgContentPath>/docs</macDmgContentPath>
+						<macDmgContentPath>src/jpackage/osx/docs</macDmgContentPath>
 					</macDmgContentPaths>
   				</configuration>
   				<executions>
