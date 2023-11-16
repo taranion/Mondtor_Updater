@@ -89,7 +89,11 @@ public class MondtorLauncher2 extends DefaultLauncher implements Launcher {
 			logger.log(Level.INFO, " {0} exists",cwd);
 		}
 		logger.log(Level.INFO, "Current working directory 2: {0}",cwd);
-    	Path binDir = cwd.resolve("runtime").resolve("bin");
+    	Path binDir = cwd.resolve("runtime");
+    	if (Files.exists(binDir.resolve("Contents"))) {
+			binDir = binDir.resolve("Contents").resolve("Home");
+		}
+    	binDir = binDir.resolve("bin");
 		logger.log(Level.INFO, "Executable directory: {0}",binDir);
 		Path jvmPath = binDir.resolve("java");
 		if (!Files.exists(jvmPath))
