@@ -74,7 +74,12 @@ public class MondtorLauncher2 extends DefaultLauncher implements Launcher {
 
 		Optional<String> info = ProcessHandle.current().info().command();
 		Path cwd = Paths.get(info.get()).getParent();
+		logger.log(Level.INFO, "Start working directory: {0}",cwd);
 		if (cwd.getFileName().toString().equals("bin"))
+			cwd = cwd.getParent();
+		if (cwd.getFileName().toString().equals("MacOS"))
+			cwd = cwd.getParent();
+		if (cwd.getFileName().toString().equals("Contents"))
 			cwd = cwd.getParent();
 		logger.log(Level.INFO, "Current working directory: {0}",cwd);
 		if (Files.exists(cwd.resolve("lib"))) {
@@ -96,8 +101,10 @@ public class MondtorLauncher2 extends DefaultLauncher implements Launcher {
     	binDir = binDir.resolve("bin");
 		logger.log(Level.INFO, "Executable directory: {0}",binDir);
 		Path jvmPath = binDir.resolve("java");
-		if (!Files.exists(jvmPath))
+		if (!Files.exists(jvmPath)) {
+			logger.log(Level.INFO, "No binary in: {0}",jvmPath);
 			jvmPath = binDir.resolve("java.exe");
+		}
     	logger.log(Level.INFO, "JVM to use: {0}",jvmPath);
      	logger.log(Level.INFO, " exists  : {0}",Files.exists(jvmPath));
 
