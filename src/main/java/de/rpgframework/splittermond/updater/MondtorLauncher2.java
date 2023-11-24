@@ -79,13 +79,11 @@ public class MondtorLauncher2 extends DefaultLauncher implements Launcher {
 			cwd = cwd.getParent();
 		if (cwd.getFileName().toString().equals("MacOS"))
 			cwd = cwd.getParent();
-		if (cwd.getFileName().toString().equals("Contents"))
-			cwd = cwd.getParent();
-		logger.log(Level.INFO, "Current working directory: {0}",cwd);
+		logger.log(Level.INFO, "directory that should contain \"runtime\": {0}",cwd);
 		if (Files.exists(cwd.resolve("lib"))) {
 			try {
 				DirectoryStream<Path>  contents = Files.newDirectoryStream(cwd);
-				contents.forEach(file -> logger.log(Level.DEBUG, "--> {0}",file));
+				contents.forEach(file -> logger.log(Level.INFO, "--> {0}",file));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
