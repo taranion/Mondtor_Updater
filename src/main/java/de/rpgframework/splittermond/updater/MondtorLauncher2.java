@@ -73,6 +73,11 @@ public class MondtorLauncher2 extends DefaultLauncher implements Launcher {
         }
 
 		Optional<String> info = ProcessHandle.current().info().command();
+		Path jvmPath = null;
+		if (info.isPresent() && info.get().endsWith("/java")) {
+			jvmPath = Paths.get(info.get());
+		} else {
+		logger.log(Level.INFO, "Start from: {0}",info.get());
 		Path cwd = Paths.get(info.get()).getParent();
 		logger.log(Level.INFO, "Start working directory: {0}",cwd);
 		if (cwd.getFileName().toString().equals("bin"))
@@ -98,10 +103,11 @@ public class MondtorLauncher2 extends DefaultLauncher implements Launcher {
 		}
     	binDir = binDir.resolve("bin");
 		logger.log(Level.INFO, "Executable directory: {0}",binDir);
-		Path jvmPath = binDir.resolve("java");
-		if (!Files.exists(jvmPath)) {
-			logger.log(Level.INFO, "No binary in: {0}",jvmPath);
-			jvmPath = binDir.resolve("java.exe");
+			jvmPath = binDir.resolve("java");
+			if (!Files.exists(jvmPath)) {
+				logger.log(Level.INFO, "No binary in: {0}",jvmPath);
+				jvmPath = binDir.resolve("java.exe");
+			}
 		}
     	logger.log(Level.INFO, "JVM to use: {0}",jvmPath);
      	logger.log(Level.INFO, " exists  : {0}",Files.exists(jvmPath));
